@@ -21,8 +21,6 @@ with minimal extra effort.
 - `details` Other notebooks which explore the data etc.
 - `notebooks` Notebooks which are not directly connected with the article.
 - `analysis` Results of running `open_cp` prediction algorithms on `opencrimedata` data.
-  - _ToDo_ : Script this more, and make as automatic as possible.
-
 - `opencrimedata` The Python package
 - `tests` And tests
 
