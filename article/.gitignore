@@ -1,0 +1,11 @@
+*.*~
+*.pdf
+*.png
+article.brf
+article.aux
+article.log
+article.synctex
+*.bz2
+*.xz
+*.zip
+*.npy
