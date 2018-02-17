@@ -6,3 +6,4 @@ pytest-cov
 
 # Used by the library
 geopandas
+scipy
