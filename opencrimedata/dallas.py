@@ -262,6 +262,14 @@ def load_street_lines(filename):
     with _fiona.open(filename) as shapefile:
         yield from _yield_street_data(shapefile)
 
+def _empty_string_to_none(x):
+    try:
+        if x == "":
+            return None
+    except:
+        pass
+    return x
+
 def _yield_street_data(shapefile):
     header = list(shapefile.schema["properties"])
     for i, key in _STREET_HEADER.items():
@@ -277,7 +285,7 @@ def _yield_street_data(shapefile):
         geo = _np.asarray(row["geometry"]["coordinates"])
         
         props = row["properties"]
-        props = {k:props[v] for k,v in _STREET_HEADER.items()}
+        props = {k:_empty_string_to_none(props[v]) for k,v in _STREET_HEADER.items()}
 
         oneway = 0
         if props[1] is not None and props[2] is None:
