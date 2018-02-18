@@ -46,6 +46,15 @@ class _BaseVoroni():
             except:
                 yield p.intersection(geo)
 
+    def _to_shapely(self, polygon_like_object):
+        try:
+            p = shapely.geometry.Polygon(polygon_like_object)
+            if p.is_empty:
+                return polygon_like_object
+            return p
+        except:
+            return polygon_like_object
+
     def to_redistributor(self, geo, distance=100):
         """Construct an instance of :class:`geometry.Redistributor` using
         clipped polygons.
@@ -56,12 +65,7 @@ class _BaseVoroni():
           enclose the point by.
         """
         if geo is None:
-            polys = []
-            for p in self.all_polygons(distance):
-                try:
-                    polys.append(shapely.geometry.Polygon(p))
-                except:
-                    polys.append(p)
+            polys = [self._to_shapely(p) for p in self.all_polygons(distance)]
         else:
             polys = list(self.all_polygons_clipped(geo, distance))
             polys = [p for p in polys if not p.is_empty]
