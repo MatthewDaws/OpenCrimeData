@@ -72,13 +72,21 @@ def load_edges(filename):
     with _fiona.open(filename) as shapefile:
         yield from _yield_edge_data(shapefile)
 
+def _empty_string_to_none(x):
+    try:
+        if x == "":
+            return None
+    except:
+        pass
+    return x
+
 def _yield_edge_data(shapefile):
     _HEADER_NAME = ["FULLNAME", "LFROMADD", "LTOADD", "RFROMADD", "RTOADD"]
     header = list(shapefile.schema["properties"])
     if not all(x in header for x in _HEADER_NAME):
         raise Exception("File schema not as expected: {}".format(shapefile.schema))
     for row in shapefile:
-        data = [row["properties"][x] for x in _HEADER_NAME]
+        data = [_empty_string_to_none(row["properties"][x]) for x in _HEADER_NAME]
         geo = _np.asarray(row["geometry"]["coordinates"])
         yield Edge(*(data+[geo]))
 
