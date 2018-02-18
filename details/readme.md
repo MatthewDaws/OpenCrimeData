@@ -8,7 +8,11 @@ Notebooks, scripts etc. which are needed to re-create research.
 - `TIGER Lines Data.ipynb`
   - Load and process data from TIGER/Lines.  Demo the library code.  Try (and fail) to match up with street names.
   The examples here are all for San Francisco.
-
+- `pyproj issues.ipynb`
+  - Explores a difference between the `pyproj` binaries on Windows and Linux.  This leads to tiny numerical differences which, while presumably not enough to change findings, does result in differing hashes for data processed on Windows or on Linux.
+  - The files `sf_proj_linux.pic.bz2` and `sf_proj_win.pic.bz2` are projected data from San Francisco showing the problem.
+- `generate_sources.py`
+  - Automatically processes the Chicago Area data into "sides"; same as is used by `open_cp`.
 
 
 ### Chicago
@@ -43,7 +47,7 @@ In logical order.
 ### San Francisco
 
 - `SF Geographic Boundaries.ipynb`
-  - Look at how to split up Chicago into "natural" areas.  As in `open_cp`.
+  - Look at how to split up San Francisco into a small number of natural areas.
 - `SF Voroni around raw points.ipynb`
   - Uses the library code to merge the input coordinates if they are very close, and then just generate a voroni diagram from the output.
 
@@ -52,6 +56,10 @@ In logical order.
 ### Dallas
 
 - `Dallas Explore Data.ipynb`
-  - ???
+  - A detailed look at the input data.  Ends with a demo of using the library to load the Dallas data.
 - `Dallas Voroni Redist.ipynb`
-  - ???
+  - Try to form voroni cells as before.  Conclude that this doesn't work well.
+- `Dallas - Road network.ipynb`
+  - Look at the street network data available for Dallas: TIGER/Lines or from the Dallas data hub.
+- `Dallas to street network.ipynb`
+  - See how the crime events (longitude and latitude data) matches to the street network.

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/MatthewDaws/OpenCrimeData.svg?branch=master)](https://travis-ci.org/MatthewDaws/OpenCrimeData) 
+
 # Open crime data
 
 ## Abstract

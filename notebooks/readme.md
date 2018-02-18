@@ -37,8 +37,19 @@ Random thoughts in notebooks.
   
 ### Dallas
 
-To document
+- `Dallas.ipynb`
+  - Initial look at the crime data.
+- `Dallas geo data.ipynb`
+  - Look at data giving the different "regions" of Dallas.
+- `Dallas parcel data.ipynb`
+  - Look at a database of "parcels" of land.  This is interesting, but it doesn't noticably different from data we can get from OSM or the open address database.
+- `Dallas geo-coding.ipynb`
+  - Look at the address database.
 
-### SANFRAN
+### San Francisco
 
-To delete??
+- `SF - Street network data.ipynb`
+  - Look at the "street centerlines" data
+- `SF - Streets into graph.ipynb`
+  - Convert this data into a graph, and look at projecting the crime events to this
+    graph.
