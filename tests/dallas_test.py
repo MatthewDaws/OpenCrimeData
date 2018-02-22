@@ -48,17 +48,17 @@ def test_write(filename, out_test_file):
 def test_load_full(filename):
     out = list(dallas.load_full(filename))
 
-    print("Possibly bad test, as ordering is not defined.")
-    assert out[0].code == "276285-2016"
-    assert out[0].crime_type == "BURGLARY"
-    assert out[0].crime_subtype == "BURGLARY-RESIDENCE"
-    assert out[0].start_time == datetime.datetime(2016,11,16, 11,0)
-    assert out[0].end_time == datetime.datetime(2016,11,18, 11,0)
-    assert out[0].call_time == datetime.datetime(2016,11,18, 11,42,26)
-    assert out[0].address == "5850 BELT LINE RD"
-    assert out[0].city == "DALLAS 75254"
-    assert out[0].lonlat == pytest.approx((-96.807131, 32.953948))
-    assert out[0].xy == pytest.approx((2487549.90103337*1200 / 3937, 7034119.57307657*1200 / 3937))
+    index = [entry.code for entry in out].index("276285-2016")
+    #assert out[0].code == "276285-2016"
+    assert out[index].crime_type == "BURGLARY"
+    assert out[index].crime_subtype == "BURGLARY-RESIDENCE"
+    assert out[index].start_time == datetime.datetime(2016,11,16, 11,0)
+    assert out[index].end_time == datetime.datetime(2016,11,18, 11,0)
+    assert out[index].call_time == datetime.datetime(2016,11,18, 11,42,26)
+    assert out[index].address == "5850 BELT LINE RD"
+    assert out[index].city == "DALLAS 75254"
+    assert out[index].lonlat == pytest.approx((-96.807131, 32.953948))
+    assert out[index].xy == pytest.approx((2487549.90103337*1200 / 3937, 7034119.57307657*1200 / 3937))
 
 def test_to_geoframe(filename):
     frame = dallas.to_geoframe(filename)
