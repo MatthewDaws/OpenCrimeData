@@ -6,12 +6,13 @@
 
 The rise of Open Data has lead to the release, especially in the USA, of rich
 crime datasets, often with seemingly precisely coded geographical locations.
-These datasets are increasingly being used by researchers; we are in particular
+These datasets are increasingly being used by researchers; we are particularly
 interested in the design and evaluation of predictive policing algorithms.
 We present a case study of data from a number of US cities, exploring some of
-the problems with naively assuming that the data is correct "as is".  We offer
-some algorithms for reassigning location points in a more "realistic", or at
-least "random" manner.  The software used is released in a Open Source manner,
+the problems with naively assuming that the data is correct ``as is''.  We develop
+novel algorithms for reassigning location points in a more ``realistic'' manner,
+operating both in two dimensional space, and on the street network.
+The software used is released in a Open Source manner,
 in the hope that other researchers can directly use, and also extend, the work,
 with minimal extra effort.
 

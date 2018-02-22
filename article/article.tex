@@ -3,8 +3,7 @@
 \usepackage[margin=2cm]{geometry}
 \usepackage{amsmath,amsthm,amssymb,latexsym}
 \usepackage{graphicx}
-\usepackage{backref}
-%\usepackage[v2,tips,curve]{xy}
+%\usepackage{backref}
 
 \theoremstyle{plain}
 \newtheorem{proposition}{Proposition}[section]
@@ -29,12 +28,13 @@
 \begin{abstract}
 The rise of Open Data has lead to the release, especially in the USA, of rich
 crime datasets, often with seemingly precisely coded geographical locations.
-These datasets are increasingly being used by researchers; we are in particular
+These datasets are increasingly being used by researchers; we are particularly
 interested in the design and evaluation of predictive policing algorithms.
 We present a case study of data from a number of US cities, exploring some of
-the problems with naively assuming that the data is correct ``as is''.  We offer
-some algorithms for reassigning location points in a more ``realistic'', or at
-least ``random'' manner.  The software used is released in a Open Source manner,
+the problems with naively assuming that the data is correct ``as is''.  We develop
+novel algorithms for reassigning location points in a more ``realistic'' manner,
+operating both in two dimensional space, and on the street network.
+The software used is released in a Open Source manner,
 in the hope that other researchers can directly use, and also extend, the work,
 with minimal extra effort.
 \end{abstract}
@@ -55,20 +55,20 @@ number of interesting features:
 \begin{itemize}
 \item Each crime event is precisely geo-coded to longitude and latitude coordinates
   which appear to correspond to the centroid of building locations.  The UK is fortunate
-  in having the UK Ordnance Survey, a publically owned company, which provides a de facto
+  in having the UK Ordnance Survey, a publicly owned company, which provides a de facto
   standard for mapping and geolocation.  From speaking to people involved in the creation
   of the data, much of the geocoding occurs by hand after the crime is reported.
 \item Each crime event comes with a ``report'' timestamp, and also an estimate of the
   time range in which the crime could have occurred.  (For example, with burglary, the
   crime is often discovered when the property owner returns to the property, and so an
-  extra time when the event occurred cannot be known.[\footnote{Add reference.}]
+  extra time when the event occurred cannot be known; see \cite{ratcliffe}.
   From our analysis, such data is somewhat noisy, with the time range often being meaninglessly
   short, or even impossible.
 \end{itemize}
 Such a dataset is a valuable resource to researchers, but it also has problems.  The data
 is private, and cannot be shared with other researchers.  This makes reproducing any
-research extremely hard.[\footnote{Reference.}]  Furthermore, the data relies upon other
-commerical products: for example, the geocoding seems to exactly correspond to data
+research extremely hard.  Furthermore, the data relies upon other
+commercial products: for example, the geocoding seems to exactly correspond to data
 from the Ordnance Survey ``MasterMap'' product, which is commerical, and not available
 free of charge to the public.  Notice also our description of certain errors, or sources of
 possible bias, in the geocoding and timestamps.
@@ -113,8 +113,9 @@ dataset.  We are not aware of any systematic exploration of the geo-coding.  The
 and Dallas datasets appear to have been used less in academic work; we chose them as they offer
 a contrast to the Chicago data in various ways.
 
-We have found surprisingly little in the literature about the effects of the input data on
-the output of crime prediction algorithms; an excellent survey article \cite{HZ}.  This paper
+We have found rather little in the literature about the effects of the input data on
+the output of crime prediction algorithms.  However, an excellent survey article is \cite{HZ}.
+This paper
 concentrates upon geocoding, by police, of crime events, and provides some recommendations.
 It gives a summary of other research suggesting that KDE methods are likely to be impacted by
 poor quality geocoding.  This paper also considers prediction techniques, and concludes:
@@ -130,7 +131,8 @@ paper fills a much needed gap.
 \subsection{Organisation of the paper}
 
 We have three main aims in this study.  Firstly, we wish to \emph{document} how we worked
-with the data, and show some of the patterns we have found.  None of the above papers seem
+with the data, and show some of the patterns we have found.  None of the above papers
+which use the (for example, Chicago) data seem
 to have discussion of the data at all, and use the data in a perhaps uncritical way.
 (There might, for example, be systematic biases which could affect results.  Or there might not.
 But without looking carefully, it is hard to know).  We will find that in all cases, the
@@ -147,10 +149,12 @@ Beyond publishing computer code, \cite{barnes}, it is also important to detail h
 and processed: this is an important aim of this paper.  Within the framework of
 Geographic Information Science, we believe in the aims of \cite{ssb}: in particular, the
 importance of using a high-level, though general purpose, programming language, to fully
-document all the steps taken in the spatial analysis.
+document all the steps taken in the spatial analysis; contrast this with using a graphical
+GIS where it is extremely hard to document exactly which steps were taken by the researcher.
 
-Our computing environment is Python~3.6.  We have developed a package \texttt{opencrimedata}
-which can be installed from the GitHub repository \footnote{Add link when done}.
+Our computing environment is Python~3.5+.  We have developed a package \texttt{opencrimedata}
+which can be installed from the GitHub
+repository\footnote{https://github.com/MatthewDaws/OpenCrimeData}.
 This provides a simple API to load the data from the datasets into Python, and a high-level
 API to perform various ``redistribution tasks'', see Section~\ref{sec:reassign}.
 All figures in this paper were produced using Jupyter Notebooks which may also be downloaded from
@@ -160,7 +164,7 @@ be of interest.
 We have found it useful to \emph{both} develop a Python package, and use notebooks.
 By working with straight Python, we can adopt a test-driven development approach, \cite{beck},
 and carefully develop moderately complicated algorithms while testing them.  We also provide
-\texttt{Pydoc} documentation on the classes and functions developed: these can be displayed
+\texttt{pydoc} documentation on the classes and functions developed: these can be displayed
 interactively in a notebook, and we have found this to be an excellent way of remembering
 how our code works, without the need to re-read the actual source code.  Notebooks then provide
 a great way to visualise the output of algorithms, and to provide additional documentation.
@@ -174,7 +178,7 @@ or 100s of lines of code in a notebook.
 
 \subsection{Acknowledgements}
 
-This work was funded by the UK Home Office Police Innovation Fund, through the
+This work was partly funded by the UK Home Office Police Innovation Fund, through the
 project ``More with Less: Authentic Implementation of Evidence-Based Predictive
 Patrol Plans''.
 
@@ -226,7 +230,7 @@ Two plots of the data are shown in Figure~\ref{fig:one}.  Here and elsewhere, th
 \texttt{TileMapBase} Python package, \cite{tmb}.  The extract plot is typical of any visualisation
 of the data-set (throughout this work, we have found that a combination of Jupyter Notebooks running
 Python has allowed for \emph{reproducible} results to be found, but that using a GIS system,
-such as QGIS, \cite{qgis}, for interactive visualisation, to be very profitable).  In particular,
+such as QGIS, \cite{qgis}, for interactive visualisation, is also very profitable).  In particular,
 we note:
 \begin{itemize}
 \item Almost all event locations seem to ``cluster'' to the middle of a street;
@@ -279,11 +283,11 @@ The base map is from OpenStreetMap, and there is a \emph{superficial} alignment 
 far from the case that there is a one-to-one correspondance between points and buildings:
 many points seem unconnected to any building, while a single building might have many points
 close to it.  There appear to be no events which occur close to alleyways or footpaths or other
-minor roads (although clearly crime \emph{must} happen does these) nor near to buildings not
-close to streets.
+minor roads (although clearly crime \emph{must} happen in these locations) nor near to
+buildings not close to streets.
 
-In summary, we do not believe that there is any real correspondance between the ``old'' points
-are the actual location of the crime.  It appears much more likely that the points are
+In summary, we do not believe that there is any real correspondence between the ``old'' points
+and the actual location of the crime.  It appears much more likely that the points are
 automatically and randomly generated from the ``Block'' on which the crime is logged against.
 
 This said, there does appear to be some real information in the side of the street which the
@@ -297,7 +301,7 @@ side in the 6500 block.
 
 There is a church prominently in these two plots.  We looked at the ``Location'' field
 and those events which claim to have happened on church property.  These do indeed seem
-to cluster close to the church, whcih a couple of other events further away.  What we
+to cluster close to the church, with a couple of other events further away.  What we
 do not see is events claiming to be from the church uniformly distributed all along
 the ``block''.  We looked at all events with a location of a church, and explored these
 using QGIS.  They appear to be clustered in a similar way, with a close, but far from
@@ -346,7 +350,7 @@ such as ``ALLEY''.  We call this the ``reduced street network''.
 \item For each crime event location, we project this to the street network (find the
 closest point on the street network).
 \item We compare the ``block'' name with the name(s) from the TIGER/Lines\regsym data.
-\item There is \emph{generally} an extremely good match, including up to street numbering
+\item There is \emph{generally} an extremely good match, including street numbering
   information if this is available.
 \end{itemize}
 However, from an \emph{algorithmic} point of view, we find a number of problems.
@@ -376,7 +380,7 @@ being minor roads forming intersections.
 \subsection{Street data specific to Chicago}
 
 The Chicago Data Portal also provides a shapefile of the street network, \cite{cstreets}.
-This data is rather similar to, but not identical, to the reduced street network.
+This data is rather similar to, but not identical to, the reduced street network.
 When comparing the resulting network with the crime events, we find exactly the same
 problems as before.  Further details are in a Jupyter Notebook.
 
@@ -394,10 +398,8 @@ not every ``block'' actually contains a building.
 In summary then, it seems possible that a concerted effort could come up with some
 automatic way to assign (most, or nearly all) crime event locations to a segment or
 section of the street network (or perhaps, maybe limited to property crime, a group
-of candiate buildings).  It does seem that a considerable amount of effort
-would be required, and it is not entirely clear what the end use of such an algorithm
-would be.[\footnote{To re-write this bit later, depending on how the rest of the
-paper develops.}]
+of candidate buildings).  It does seem, however, that a considerable amount of effort
+would be required.  We revisit these ideas in Section~\ref{sec:sf_assign_to_buildings} below.
 
 
 
@@ -420,7 +422,7 @@ The data comes as a CSV file, from which we find the following meanings for the 
 \begin{itemize}
 \item \texttt{PdId}, a unique identifier for each row.
 \item \texttt{IncidntNum}, seems to be unique to the \emph{incident} but there may be multiple
-  rows with the same number.  The \emph{vast} majority of repeats are multiple offenses committed at the same time
+  rows with the same number.  The \emph{vast} majority of repeats are multiple offences committed at the same time
   and place.  A rather small number are linked crimes across different times (often e.g. a stolen vehicle
   which is later recovered).
 \item \texttt{Category}, which is the crime type, from 39 options, e.g. ``BURGLARY''.
@@ -573,7 +575,7 @@ We extract the following fields:
 
 For some records, those from 2016 and late 2015 it seems, we have two sources of geo-coding.  It appears that
 EPSG:2845 is used to project the longitude and latitude coordinates, but there is not an exact match
-between the two geo-codings.  Figure~\ref{fig:dallas_geocoding} shows the two geo-codings.  By
+between the two geocodings.  Figure~\ref{fig:dallas_geocoding} shows the two geocodings.  By
 carefully examining a basemap, it appears that (with a few outliers) the longitude and latitude
 are always in the centre of the street, exactly outside the correct address.  The projected coordinates
 seem reasonably randomly offset; we have not been able to see much pattern in the difference, except
@@ -590,7 +592,7 @@ and latitude, while $\bullet$ marks the projected x,y coordinates, and a line jo
 We would almost certainly prefer to use the longitude and latitude coordinates, but these are only
 provided for a subset of the records.
 
-There is also a street centre lines file available a \cite{dstreets} which yet again is similar
+There is also a street centre-lines file available a \cite{dstreets} which yet again is similar
 to, but not quite identical, to the TIGER/Lines\regsym data.  We note that the Dallas city
 limits straddle two TIGER/Lines\regsym files, and so the data from \cite{dstreets} is easier to use.
 
@@ -609,13 +611,12 @@ areal unit, and certainly if we are looking at larger areas, such as community
 neighbourhoods, police districts, etc., then clearly the exact location is unimportant.
 
 However, we are interested in crime prediction algorithms.  These typically function
-on small to very small \emph{grid} cells, or directly on the street network.
-[\footnote{References!}]
+on small to very small \emph{grid} cells, or directly on the street network, see
+\cite{arc, bjp, rand, rosser_sepp, rosser_nw}.
 If the grid size is small, comparable to the length of a city block, then with the
 clustering of events which we see, minor variation in the exact alignment of
 grid cells could have a large effect, as all at once a large number of events move
-across the boundaries of the cells.
-[\footnote{Give some examples!}]
+across the boundaries of the cells; compare Section~\ref{sec:preds_grid} below.
 
 For network based predictions, it perhaps becomes slightly less important for
 e.g. the Chicago data, as this already appears to be aligned to the network.
@@ -626,7 +627,7 @@ have a decision to make as which edge all the points from every intersection
 belong to.
 
 Finally, if we are interested in the performance of our algorithms on real-world data
-which does have exact geocoding (e.g. internal Police data) then it would be highly
+which does have exact geocoding (e.g. internal Police data) then it would be hugely
 useful to have open data which had the same characteristics.
 
 In the subsequent sections, we develop a number of algorithms which seek to
@@ -642,7 +643,7 @@ either side of the road, with longer roads being split up) and then the real loc
 is assigned to the closest cluster location.
 
 We obviously cannot undo this procedure, but we can simulate plausible locations.
-This is related, somewhat, to the general idea of ``imputation'' in statistics, where we
+This is related, by analogy, to the general idea of ``imputation'' in statistics, where we
 seek to replace missing values in data.
 
 If we believe exactly the ``closest point'' hypothesis, then the notion of a Voronoi
@@ -687,11 +688,13 @@ shows the new locations.
 
 \subsection{Using the street network}
 
-A variety of new crime predictions algorithms work directly on the street network, rather
-than with areal grid cells.  [\footnote{Add couple of references}]
+A variety of new crime prediction algorithms work directly on the street network, rather
+than with areal grid cells, see \cite{rosser_nw, ss}.
 A stated advantage of looking directly at the street network is that it is actually
 physical streets which police can patrol.  From our perspective, it is also worth noting
-that real-world geo-coding is likely to correspond to buildings, or the street network.
+that real-world geocoding is likely to correspond to buildings, or directly to
+the street network.  Here, and below, we freely use basic ideas from graph theory, see
+for example \cite{wilson}.
 
 As the next stage of ``redistribution'', we have taken the output of the previous section,
 and have projected the coordinates onto the street network (that is, choose the point on an
@@ -700,8 +703,9 @@ the data from \cite{sfgeo}, as discussed before.  The data from \cite{tiger} see
 
 The result is shown in Figure~\ref{fig:sf_net_1}.  The plot on the right shows the same view
 as in Figures~\ref{fig:sf_vor_1} and~\ref{fig:sf_vor_2}.  The lines join the original location
-(from the input file) to the location chosen at random in the Voroni cell, to the projected
-location.  The plot on the left just shows the projected locations.  Notice that small alleyways
+(from the input file) to the location chosen at random in the voroni cell, and then
+join to the projected location.
+The plot on the left just shows the projected locations.  Notice that small alleyways
 are not in the street network data.  There is some ``clustering'', in fact reminiscent of
 the Chicago dataset, but by comparing to the plot on the right, this seems to be caused
 by an unequal number of events between those geocoded to the intersections (rather few events)
@@ -709,11 +713,11 @@ and those geocoded to the centre of the street segments (quite a few events).  A
 redistribute uniformly in two-dimensional space, and then projected back down to the
 one-dimensional street network, we see that events can end up being moved only a little way
 (the bulk of events from the middle of the north/south aligned streets) but occasionally can
-be moved a long way.
+be moved a long way.  In the next section, we explore ways to remedy this.
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{san_fran_two_stage_network_projection.png}
-  \caption{Projecting the points, as in Figure~\ref{fig:sf_vor_2}, to the street network.}
+  \caption{Projecting the points, given by Figure~\ref{fig:sf_vor_2}, to the street network.}
   \label{fig:sf_net_1}
 \end{figure*}
 
@@ -727,9 +731,9 @@ of a street; recall the right-hand plots in Figure~\ref{fig:five}).  There are a
 typically near parkland or the coast.
 
 Given this, we might \emph{start} by projecting the points to the network, and then work with
-an algorithm which just ``sees'' the network structure.  Again, we first aggregate very close
-points, project to the network, and then perform a further aggregation step on the network,
-combining points which within 10m of each other, distance now measured on the network.
+an algorithm which only ``sees'' the network structure.  Again, we first aggregate very close
+points, then we project to the network, and then we perform a further aggregation step on the
+network, combining points which are within 10m of each other, distance now measured on the network.
 
 The algorithm we use combines the data
 of the network, and all the original input points, in the belief that the original input points
@@ -745,8 +749,9 @@ that we can continue up to the minimum distance.
 \item We only consider the shortest paths when computing the ``blocking'' points in the
 step above.
 \end{itemize}
-The idea is that we can move anywhere within the minimum distance, but we can move further,
-up to the maximum distance, so long as we don't encounter another input point.  We hence adaptively
+The idea is that we can move anywhere within the minimum distance, but we can also move
+further, up to the maximum distance, so long as we don't encounter another input point.
+We hence adaptively
 change the size of the region we consider, according to the density of the input points.
 Figure~\ref{fig:sf_flow_network} illustrates this: to the north and west we stop at the next
 input point, but to the south and west we continue a little further until we reach the 50m
@@ -773,6 +778,7 @@ The left panel shows the result for the street network from \cite{sfgeo}, and th
 panel the result for the street network from \cite{tiger}.}
   \label{fig:sf_flow_redist}
 \end{figure*}
+
 
 
 \subsection{Assign to buildings}\label{sec:sf_assign_to_buildings}
@@ -807,7 +813,7 @@ a nearby building, without a bias to one side of the street or the other.
 
 \section{Chicago}\label{chicago_redist_1}
 
-We shall jump straight in, and use the street network from \cite{tiger} to form Voroni cells.
+We shall jump straight in, and use the street network from \cite{tiger} to form voroni cells.
 We use the reduced street network (see Section~\ref{sec:link_st_net}) and form a voroni
 cell around the mid-point of each edge in the network.  We then partition the network into
 ``segments''.  A segment is a maximal path where each interior node in the path has degree two.
@@ -819,7 +825,7 @@ algorithm works well, capturing well the structure of the street network.  Howev
 end up with some rather small cells.  The shape of the cells is also quite dependent on
 the number of edges in the original reduced graph: long straight streets will only use the
 mid-point of single edge, while a (slightly) curving street may consist of many edges, and
-so ends up with a larger Voroni cell.
+so ends up with a larger voroni cell.
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{chiago_voroni_street_network_polys.png}
@@ -832,7 +838,7 @@ new points.
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{chicago_redist_network.png}
-  \caption{Example of using Voroni cells derived from the street network, for Chicago, to redistribute points.}
+  \caption{Example of using voroni cells derived from the street network, for Chicago, to redistribute points.}
   \label{fig:chicago_vor_1}
 \end{figure*}
 
@@ -840,7 +846,7 @@ new points.
 \subsection{Use the clustering of the input data}\label{sec:chicago_vor_from_clusters}
 
 The input data, Figure~\ref{fig:one}, shows very strong clustering, so it seems possible
-that we could use this along to form Voroni cells.  We start by merging points which are
+that we could use this alone to form voroni cells.  We start by merging points which are
 close together.  We perform this using a graph-based algorithm:
 \begin{itemize}
 \item Each point is a node of the graph;
@@ -869,13 +875,13 @@ See Figure~\ref{fig:chicago_vor_3} for examples of the voroni cells thus formed.
   \label{fig:chicago_vor_3}
 \end{figure*}
 
-Figure~\ref{fig:chicago_vor_4} shows a resulting redistrbution.  This looks similar to
+Figure~\ref{fig:chicago_vor_4} shows a resulting redistribution.  This looks similar to
 \ref{fig:chicago_vor_1} but we see that points originally on the east/west streets are
 distributed further.
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{chicago_redist_cluster.png}
-  \caption{Example of using Voroni cells derived from clustering, for Chicago, to redistribute points.}
+  \caption{Example of using voroni cells derived from clustering, for Chicago, to redistribute points.}
   \label{fig:chicago_vor_4}
 \end{figure*}
 
@@ -897,11 +903,11 @@ of the initial closest choice.  Figure~\ref{fig:chicago_buildings_1} shows the r
 \begin{figure}
   \includegraphics[width=3.5in]{chicago_buildings_1.png}
   \caption{Assigning the input point to a building location directly.  Initial and final
-points are marked, together with a connnecting line.}
+points are marked, together with a connecting line.}
   \label{fig:chicago_buildings_1}
 \end{figure}
 
-Finally, we can take the output the the ``network flow'' idea, and again then again assign
+Finally, we can take the output of the ``network flow'' idea, and again assign
 to a building, using the same algorithm as in Section~\ref{sec:sf_assign_to_buildings}.
 This leads to Figure~\ref{fig:chicago_buildings_2}.  The left-hand plot here shows an
 obvious weakness with the idea of using building / address data: if there are few (or only one)
@@ -930,9 +936,9 @@ We firstly try to use this partial data to ``guess'' a street network location f
 points, as follows:
 \begin{itemize}
 \item We look at crime events only where we have both a longitude and latitude coordinates,
-  and (randomly displaced) projected $x,y$ coordinates.  We ignore events where the two
-  coordinates (after projecting using EPSG:2845) differ by more than 250m.  This removes about
-  2.2\% of the data.
+  and (seemingly randomly displaced) projected $x,y$ coordinates.  We ignore events where the two
+  coordinates (after projecting using EPSG:2845) differ by more than 250m.  This latter
+  step removes about 2.2\% of the data.
 \item Project each longitude and latitude coordinate to the street network from
   \cite{dstreets}.  99\% of the input points are moved less than 8.4 meters by the operation.
 \item We now form a Voroni diagram from the $x,y$ coordinates (merging those closer than
@@ -944,7 +950,7 @@ points, as follows:
   the $x,y$ coordinates, find the associated street segment, and then pick a point uniformly
   at random on that segment.
 \item For those rows which have longitude and latitude coordinates, we move the vast majority
-  of points between 1 meter and 1000 meters, most points moving less than 100 meters.  Given
+  of points between 1 metre and 1000 metres, most points moving less than 100 metres.  Given
   the random assignment, this suggests a good match.  However, there are certainly some
   outliers which are moved a long way.
 \end{itemize}
@@ -961,8 +967,9 @@ plotted as $\times$, with a line connecting to the new street network location.}
   \label{fig:dallas_to_streets}
 \end{figure*}
 
-Finally, we assign these new points to buildings, see Figure~\ref{fig:dallas_to_buildings}.
-For reasons we explain shortly, we simply look at a disc around each point, initially of
+Finally we assign these new points to buildings, see Figure~\ref{fig:dallas_to_buildings}.
+For the reasons explained in Section~\ref{sec:sf_assign_to_buildings},
+we simply look at a disc around each point, initially of
 radius 30m, and see if there are any buildings.  We increase the disc by 10m radius at a time,
 until we do find a building.  If there is a choice, we pick on uniformly at random.
 On the right of Figure~\ref{fig:dallas_to_buildings} we show a deliberately chosen difficult
@@ -983,20 +990,109 @@ $\times$.  All buildings are marked with a $+$.}
 
 
 
-\section{Conclusion: Making predictions}
 
-To Write.
+\section{Conclusion: Making predictions}\label{sec:preds}
+
+As an example application, we apply run some of the prediction algorithms developed in
+\texttt{open\_cp} on both the original data, and some of the ``redistributed'' data.
+In this case study, we use the South side of Chicago area, limit to just Burglary events,
+and (for variation from
+previously published studies) the data from 2007.  We use the data from January through
+September 2007 as ``training data'', and then make predictions for each day, in turn, from
+October through December 2007.  We note that an advantage of having an entirely automated,
+scripted approach is that, if we wished to analysis a different time span, or a different
+geographical area, we would literally need to change only a couple of lines of code, and
+then re-run the scripts.
+
+We show results for two prediction methods:
+\begin{itemize}
+\item The ``KDE'' method, which can be thought of as a ``modern'' prospect hotspotting
+technique, compare \cite{bjp}.  We use a Gaussian KDE method for events in space, combined
+with an exponential decay in time.  Compare with the description of the grid based method
+in \cite{rosser_nw}.
+\item The ``STScan'' technique, detailed in \cite{arc} for example.  This technique attempts
+to find space-time cylinders which are experiencing an unexpected ``cluster'' of events.
+\end{itemize}
+For both methods, we use a grid of size 150m square, and the prediction technique ranks the
+grid cells from most risky to least risky.  We then form a ``hotspot'' by selecting a
+``coverage level'', say 10\%, and selecting the riskiest 10\% of grid cells.  Given the prediction,
+we then score it by seeing how many of the actual crime events for the next day we ``captured''
+inside our hotspot.  See \cite{arc, bjp} for more details of this by now standard methodology.
+
+We statistically model this by treating each day independently, and assuming that the number of
+captured events $n_i$ will be distributed as a Binomial out of $N_i$ total events, with chance
+of success $\theta$ (independent of the day).  In \texttt{open\_cp} we implement a Bayesian
+approach, using a Beta distribution for $\theta$, and then calculating the median of the posterior
+distribution for $\theta$.  In practice, this will be close to the maximum likelihood estimation
+for $\theta$, which is
+\[ \hat\theta = \frac{\sum_i n_i}{\sum_i N_i}. \]
+Notice that this is \emph{different} to simply calculating the mean of the daily ``hit-rates'',
+which would be $\frac1k \sum_i n_i / N_i$; this is more commonly used in the literature, but
+does not seem to fit a statistical model (it would tend to be biased if $N_i$, the total
+number of events, varied from day to day).
+
+For both of these methods, there are various parameters (often termed ``bandwidths'') which can
+be changed.  The choice of parameter is often not fully addressed in the literature, see
+\cite{arc} for example, and compare the apparent novelty of using a MLE approach in
+\cite{rosser_nw}.  We take a data-driven approach and try a variety of bandwidths, and
+then select the one with the highest hit-rate (note that in other circumstances, this
+could be criticised for mixing up ``training'' and ``evaluation'' datasets).  We use the same
+settings across the datasets.
+
+Figure~\ref{fig:hit_rates} shows the results.  We plot the hit-rate (as described above) against
+coverage level.  We only extend to 20\% coverage level: if such hot-spots are ultimately
+meant to inform police patrol plans, then selecting a large proportion of the study area as a
+``hot-spot'' is fairly meaningless.
+
+For the KDE predictor, we see that the original data gives a modest but notably higher
+hit-rate.  This difference is certainly comparable to the differences between different
+\emph{algorithms} as observed on the Chicago data in \cite{arc}.  This emphasises the point
+that the \emph{exact nature} of the data might well be as important as the algorithm when it
+comes to the hit-rate performance.  The ``STScan'' results are similar, but here we also
+see a noticeable difference with the case when events are distributed to building performing
+best.  It is interesting to note that this is the data we think most likely reproduces
+``real-world'' police data (which is likely to be geocoded to individual addresses, at least
+for events like Burglary).
 
 \begin{figure*}
   \includegraphics[width=\textwidth]{hit_rates.pdf}
-  \caption{To Write}
+  \caption{Hit-rate curves for two prediction techniques as applied to original data from
+  the South side of Chicago, and two ``redistributed'' datasets.  See Section~\ref{sec:preds}.}
   \label{fig:hit_rates}
 \end{figure*}
 
 
+\subsection{Variability with grid offset}\label{sec:preds_grid}
+
+We finish with a short exploration of how changing the grid \emph{offset}, but keeping all
+other settings the same.  We use a variant of the prospective hot-spotting technique,
+\cite{bjp}, with settings kept the same between datasets, on the same three datasets as above.
+We compute the median hit-rate for 50 randomly chosen grid offsets, and find the 5\% and 95\%
+percentiles.  Figure~\ref{fig:hit_rates_grid} shows how the absolute difference in hit-rate
+varies with coverage.  It is interesting to note:
+\begin{itemize}
+\item The slight positive correlation between coverage level and ``variability'' for
+the two ``redistributed'' datasets; but the general lack of correlation for the original
+dataset.
+\item That, for low (and so possibly more ``realistic'') coverage levels, the two
+``redistributed'' datasets show somewhat less variability than the original dataset.
+\end{itemize}
+
+\begin{figure*}
+  \includegraphics[width=\textwidth]{hit_rates_grid_vary.pdf}
+  \caption{Difference in median hit rate from 95\% percentile to 5\% percentile at
+  various hit rates.  See Section~\ref{sec:preds_grid}.}
+  \label{fig:hit_rates_grid}
+\end{figure*}
+
 
 
 \begin{thebibliography}{99}
+
+\bibitem{arc} M. Adepeju, G. Rosser, R. Cheng,
+   ``Novel evaluation metrics for sparse spatio-temporal point process hotspot predictions - a crime case study'',
+   International Journal of Geographical Information Science 30 (2016) 2133--2154.
+   DOI: 10.1080/13658816.2016.1159684
 
 \bibitem{barnes} N. Barnes, ``Publish your computer code: it is good enough'',
   Nature 467 (2010) 753.
@@ -1004,31 +1100,53 @@ To Write.
 \bibitem{beck} K. Beck, ``Test Driven Development: By Example''
   (Addison-Wesley Professional, 2002).
 
+\bibitem{bjp} K.\,J. Bowers, S.\,D. Johnson, K. Pease,
+	``Prospective Hot-Spotting.  The future of crime mapping?'',
+	The British Journal of Criminology (2004) 44 641--658.
+
 \bibitem{cdata} Chicago Data Portal, ``Crimes - 2001 to present'', available at
-   \texttt{https://data.cityofchicago.org/Public-Safety/Crimes-2001-to-present/ijzp-q8t2}
+   {\small
+   \texttt{https://data.cityofchicago.org/Public-Safety/} \texttt{Crimes-2001-to-present/ijzp-q8t2}}
 
 \bibitem{cgeo} Chicago Data Portal, ``Boundaries - Community Areas (current)'', available at
-    \texttt{https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6}
+   {\small\texttt{https://data.cityofchicago.org/Facilities-}
+   \texttt{Geographic-Boundaries/Boundaries-Community-}
+   \texttt{Areas-current-/cauq-8yn6}}
 
 \bibitem{cstreets} Chicago Data Portal, ``Street Center Lines '' available at
-    \texttt{https://catalog.data.gov/dataset/street-center-lines}
+   {\small
+    \texttt{https://catalog.data.gov/dataset/street-}
+   \texttt{center-lines}}
 
 \bibitem{ddata} Dallas OpenData, ``Police Incidents'' available at
-    \texttt{https://www.dallasopendata.com/Public-Safety/Police-Incidents/tbnj-w5hb}
+   {\small
+    \texttt{https://www.dallasopendata.com/Public-Safety/}
+   \texttt{Police-Incidents/tbnj-w5hb}}
 
 \bibitem{dstreets} Dallas OpenData, ``Streets Shapefile'' available at
-    \texttt{https://www.dallasopendata.com/Geography-Boundaries/Streets-Shapefile-Polyline/cvgm-fp24}
+   {\small
+    \texttt{https://www.dallasopendata.com/Geography-}
+   \texttt{Boundaries/Streets-Shapefile-Polyline/}
+   \texttt{cvgm-fp24}}
 
 \bibitem{sfdata} DataSF, ``Police Department Incidents'' available at
-    \texttt{https://data.sfgov.org/Public-Safety/Police-Department-Incidents/tmnf-yvry}
+   {\small
+    \texttt{https://data.sfgov.org/Public-Safety/Police-}
+   \texttt{Department-Incidents/tmnf-yvry}}
 
 \bibitem{sfgeo} DataSF, ``San Francisco Basemap Street Centerlines'' available at
-    \texttt{https://data.sfgov.org/Geographic-Locations-and-Boundaries/San-Francisco-Basemap-Street-Centerlines/7hfy-8sz8}
+   {\small
+    \texttt{https://data.sfgov.org/Geographic-Locations-}
+   \texttt{and-Boundaries/San-Francisco-Basemap-}
+   \texttt{Street-Centerlines/7hfy-8sz8}}
 
-\bibitem{tmb} M. Daws, ``TileMapBase'', \texttt{https://github.com/MatthewDaws/TileMapBase}
+\bibitem{tmb} M. Daws, ``TileMapBase'',
+   {\small\texttt{https://github.com/MatthewDaws/TileMapBase}}
 
 \bibitem{econ1} The Economist, ``Crime statistics in Chicago: Deceptive numbers'', published
-  May 22nd 2014, see \texttt{https://www.economist.com/blogs/democracyinamerica/2014/05/crime-statistics-chicago}
+  May 22nd 2014, see
+  {\small\texttt{https://www.economist.com/blogs/democracy}
+   \texttt{inamerica/2014/05/crime-statistics-chicago}}
 
 \bibitem{eftelioglu} E. Eftelioglu et al. ``Mining Network Hotspots with Holes: A Summary of Results'',
   pp. 51--67, in ``Geographic Information Science.  9th International Conference, GIScience 2016, Montreal, QC, Canada'',
@@ -1041,10 +1159,12 @@ To Write.
 \bibitem{HZ} T.\,C. Hart, P.\,A. Zandbergen,
   ``Effects of Data Quality on Predictive Hotspot Mapping'',
   NCJRS report 239861, September 2012, available at
-  \texttt{https://www.ncjrs.gov/app/publications/abstract.aspx?id=261934}
+  {\small
+  \texttt{https://www.ncjrs.gov/app/publications/}
+   \texttt{abstract.aspx?id=261934}}
 
 \bibitem{hl} T. Hothorn, F. Leisch, ``Case studies in reproducibility'',
-  Briefings in Bioinformatics 12 (2011) 288--300 https://doi.org/10.1093/bib/bbq084
+  Briefings in Bioinformatics 12 (2011) 288--300 DOI: 10.1093/bib/bbq084
 
 \bibitem{morin} A. Morin et al. ``Shining light into black boxes'',
   Science 336 (2012) 159--160.
@@ -1053,16 +1173,17 @@ To Write.
   ``Spatial tessellations : concepts and applications of Voronoi diagrams'',
   (Wiley \& Sons, 1992.)
 
-\bibitem{oa} OpenAddress, https://openaddresses.io/
+\bibitem{oa} OpenAddress, {\small\texttt{https://openaddresses.io/}}
 
 \bibitem{odi} Open Data Institute, ``What is open data?'', available at
-   \texttt{https://theodi.org/what-is-open-data}
+   {\small\texttt{https://theodi.org/what-is-open-data}}
 
 \bibitem{osm} OpenStreetMap, ``Copyright and License'' available at
-   \texttt{http://www.openstreetmap.org/copyright}
+   {\small\texttt{http://www.openstreetmap.org/copyright}}
 
 \bibitem{qgis} Quantum GIS Development Team (2017).
-  Quantum GIS Geographic Information System. Open Source Geospatial Foundation Project. \texttt{http://qgis.osgeo.org}
+  Quantum GIS Geographic Information System. Open Source Geospatial Foundation Project.
+  {\small\texttt{http://qgis.osgeo.org}}
 
 \bibitem{rand} W.\,L. Perry, B. McInnis, C.\,C. Price, S.\,C. Smith, J.\,S. Hollywood,
         ``Predictive Policing. The Role of Crime Forecasting in Law Enforcement Operations'',
@@ -1076,14 +1197,27 @@ temporal events'', International Journal of Geographical Information Science, 14
    Prediction with the Self-Exciting Point Process Through Isotropic Triggering'',
    Appl. Spatial Analysis (2016). DOI:10.1007/s12061-016-9198-y
 
+\bibitem{rosser_nw} G. Rosser, T. Davies, K.\,J. Bowers, S.\,D. Johnson, T. Cheng,
+   ``Predictive Crime Mapping: Arbitrary Grids or Street Networks?'',
+   J Quant Criminol (2017) 33: 569--594. DOI: 10.1007/s10940-016-9321-x
+
+\bibitem{ss} S. Shiode, N. Shiode,
+   ``Microscale Prediction of Near-Future Crime Concentrations with Street-Level Geosurveillance'',
+   Geographical Analysis 46 (2014) 435--455.  DOI: 10.1111/gean.12065
+
 \bibitem{ssb} A.\,D. Singleton, S. Spielman, C. Brunsdon,
    ``Establishing a framework for Open Geographic Information science'',
    International Journal of Geographical Information Science (2016) 30:8 1507-1521.
    DOI: 10.1080/13658816.2015.1137579
 
 \bibitem{tiger} United States Census Bureau, ``TIGER/Line\regsym Shapefiles'',
-   available at \texttt{https://www.census.gov/geo/maps-data/data/tiger-line.html}
+   available at
+   {\small\texttt{https://www.census.gov/geo/maps-data/}
+   \texttt{data/tiger-line.html}}
 
+\bibitem{wilson} R. Wilson, Introduction to Graph Theory, fifth edition.
+   (Prentice Hall, 2010).
+   
 \end{thebibliography}
 
 
@@ -1094,6 +1228,8 @@ temporal events'', International Journal of Geographical Information Science, 14
 University of Leeds\\
 Leeds\\
 LS2 9JT}
+
+\medskip
 
 \noindent\emph{Current address:}
 \parbox[t]{3in}{Jeremiah Horrocks Institute\\
