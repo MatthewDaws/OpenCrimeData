@@ -27,3 +27,8 @@ with minimal extra effort.
 - `opencrimedata` The Python package
 - `tests` And tests
 
+### Installation
+
+Clone or download.  Run
+
+     python setup.py install
