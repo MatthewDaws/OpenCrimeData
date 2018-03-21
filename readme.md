@@ -9,8 +9,8 @@ crime datasets, often with seemingly precisely coded geographical locations.
 These datasets are increasingly being used by researchers; we are particularly
 interested in the design and evaluation of predictive policing algorithms.
 We present a case study of data from a number of US cities, exploring some of
-the problems with naively assuming that the data is correct ``as is''.  We develop
-novel algorithms for reassigning location points in a more ``realistic'' manner,
+the problems with naively assuming that the data is correct "as is".  We develop
+novel algorithms for reassigning location points in a more "realistic" manner,
 operating both in two dimensional space, and on the street network.
 The software used is released in a Open Source manner,
 in the hope that other researchers can directly use, and also extend, the work,
