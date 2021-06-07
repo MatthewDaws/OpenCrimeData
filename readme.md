@@ -16,11 +16,14 @@ The software used is released in a Open Source manner,
 in the hope that other researchers can directly use, and also extend, the work,
 with minimal extra effort.
 
+### Article
+
+See the [article](article/) directory for the LaTeX source-code, or [download a PDF file here](article.pdf).
+
 ### Folder structure
 
 - `article` The LaTeX source of the article, and Jupyter notebooks to produce graphics etc.
   directly for the article.
-
 - `details` Other notebooks which explore the data etc.
 - `notebooks` Notebooks which are not directly connected with the article.
 - `analysis` Results of running `open_cp` prediction algorithms on `opencrimedata` data.
